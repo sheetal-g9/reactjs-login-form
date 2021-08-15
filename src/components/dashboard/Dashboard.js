@@ -1,22 +1,22 @@
 import React, { Component } from "react";
 import { Row, FormGroup, FormControl, ControlLabel, Button, HelpBlock } from 'react-bootstrap';
-import './login.sass';
+import './dashboard.sass';
 import { isEmail, isEmpty, isLength, isContainWhiteSpace } from 'shared/validator';
 import axios from 'axios'
-import  { Redirect } from 'react-router-dom'
 
-class Login extends Component {
+class Dashboard extends Component {
 
     constructor(props) {
         super(props)
-
+        console.log(this.props.location.state.token)
         this.state = {
             formData: {}, // Contains login form data
             errors: {}, // Contains login field errors
             formSubmitted: false, // Indicates submit status of login form
             loading: false, // Indicates in progress state of login form
             loggedin: false,
-            message: ""
+            message: "",
+            token: this.props.location.state.token
         }
     }
 
@@ -90,7 +90,6 @@ class Login extends Component {
             console.log(response)
             console.log("Success!!")
 
-
             this.setState({
                 loggedin: true,
                 token: response.data.token,
@@ -98,8 +97,8 @@ class Login extends Component {
             })
             // window.location.reload(false)
             console.log(this.state.loggedin)
-            // window.location.replace("/dashboard")
-            return generaterows()
+            window.location.replace("/page")
+
         }).catch(err => {
             console.log("Wrong Credentials")
         }) 
@@ -118,15 +117,11 @@ class Login extends Component {
 
     }
 
-    redirect = () => {
-        if (this.state.loggedin) {
-           return <Redirect to={{
-                pathname: '/dashboard',
-                state: { token: this.state.token }
-            }}
-        />
-        }
-        return null
+    generateTable = () => {
+        return (
+           
+
+            )
     }
 
     render() {
@@ -134,36 +129,30 @@ class Login extends Component {
         const { errors, formSubmitted } = this.state;
 
         return (
-            <div className="Login">
+            <div className="Dashboard">
                 <Row>
-                    <Button bsStyle="primary" onClick={ this.state.loggedin ? this.logout : function(){} }> { this.state.loggedin == true ? "Logout" : "Please Login" }</Button>
-                    <p id="message"> { this.state.message }</p>
-                    <form onSubmit={this.login}>
-                        <FormGroup controlId="email" validationState={ formSubmitted ? (errors.email ? 'error' : 'success') : null }>
-                            <ControlLabel>Email</ControlLabel>
-                            <FormControl type="text" name="email" placeholder="Enter your email" />
-                        { errors.email &&
-                            <HelpBlock>{errors.email}</HelpBlock>
-                        }
-                        </FormGroup>
-                        <FormGroup controlId="password" validationState={ formSubmitted ? (errors.password ? 'error' : 'success') : null }>
-                            <ControlLabel>Password</ControlLabel>
-                            <FormControl type="password" name="password" placeholder="Enter your password" />
-                        { errors.password &&
-                            <HelpBlock>{errors.password}</HelpBlock>
-                        }
-                        </FormGroup>
-                        <Button type="submit" bsStyle="primary" >Sign-In</Button>
-                         
-                        <Button bsStyle="primary" display={ this.loggedin ? "none" : "block"} onClick={ this.state.loggedin ? function(){} : this.signUp }> { this.state.loggedin == true ? "Logout" : "Sign Up" }</Button>
-                    </form>
+                    <div className="container">
+                    <h1>    Token : {this.state.token}</h1>
+                     <table className="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">First</th>
+                          <th scope="col">Last</th>
+                          <th scope="col">Handle</th>
+                        </tr>
+                      </thead>
+                      <tbody id="bodytable">
 
+                            { this.generateRows() }
+                        
+                      </tbody>
+                    </table>   
+                  </div>
                 </Row>
-            { this.redirect() }
             </div>
-
         )
     }
 }
 
-export default Login;
+export default Dashboard;
